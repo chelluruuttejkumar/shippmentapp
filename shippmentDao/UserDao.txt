@@ -1,0 +1,59 @@
+package userproductappdao;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+import userproductappdto.User;
+
+public class UserDao 
+{
+	EntityManager em=Persistence.createEntityManagerFactory("dev").createEntityManager();
+	 public User saveUser(User user) 
+	 {
+		 em.persist(user);
+		 EntityTransaction trans=em.getTransaction();
+		 trans.begin();
+		 trans.commit();
+		return user;
+	}
+	public  User updateUser(User user) 
+	{
+		em.merge(user);
+		EntityTransaction trans=em.getTransaction();
+		trans.begin();
+		trans.commit();
+		 return user;
+	 }
+	 public User findUserbyid(int id ) 
+	 {
+		 return em.find(User.class, id);
+		
+	}
+	  public User verifyUser(long phone,String password) {
+		 Query q=em.createQuery("select u from User u where u.phone=?1 and u.password=?2");
+		 q.setParameter(1, phone);
+		 q.setParameter(2, password);
+		 try {
+		 return(User) q.getSingleResult();
+		 } catch(NoResultException e) {
+			 return null;
+		 }
+	 }
+	   public boolean deleteUser(int id ) 
+	   {
+		  User u=findUserbyid(id);
+		  if(u!=null) {
+			  em.remove(u);
+			  EntityTransaction trans=em.getTransaction();
+				 trans.begin();
+				 trans.commit();
+			  return true;
+		  }
+		  return false;
+	  }
+	  
+	   
+}
